@@ -1,0 +1,59 @@
+Procedimiento a seguir:
+
+  1.- Doble click sobre el fichero "camscript_2_camaras.py" de la carpeta "camscript" del escritorio.
+  2.- Se deberían abrir dos ventanas, una por cada cámara conectada.
+
+      -> Es necesario que las dos cámaras estén conectadas y funcionen correctamente. Una 
+         forma rápida de comprobar esto es abrir la aplicación de Windows de "Camera" y 
+         ver (1) que detecta las dos cámaras y (2) que puedes ir de una cámara a otra sin
+         problema.
+
+  3.- Una vez tienes las dos ventanas abiertas, podemos empezar a grabar videos/sacar fotos.
+      Para ello, disponemos de los siguientes "comandos":
+
+      -> SACAR FOTOS
+            - Presionando la tecla "Espacio"
+            - Presionando la tecla "i"
+            - Presionando la tecla "I" (por si hay un BloqMayus por ahí suelto)
+
+            * Nota 1: cuando se saca una foto, sale en consola el mensaje de '--- SACAMOS FOTO ---'
+            * Nota 2: se pueden sacar fotos mientras se graba un vídeo sin problema
+
+      -> GRABAR VIDEOS
+            - Presionando la tecla "Enter"
+            - Presionando la tecla "v"
+            - Presionando la tecla "V" (por si hay un BloqMayus por ahí suelto)
+
+            * Nota 1: cuando se comienza a grabar un video, sale en consola el mensaje de 
+                '--- COMENZAMOS VIDEO ---'; cuando se termina de grabar un video, sale en consola 
+                el mensaje de '--- DETENEMOS VIDEO ---'
+            * Nota 2: no es necesario detener la grabación de un vídeo para salir del programa, 
+                una vez se sale del programa se detiene (si es que hay) el proceso de grabación 
+                en curso hasta ese momento
+
+      -> SALIR
+            - Presionando la tecla "Esc"
+            - Presionando la tecla "q"
+            - Presionando la tecla "Q" (por si hay un BloqMayus por ahí suelto)
+
+            * Nota 1: las ventanas solo pueden cerrarse por estas teclas
+
+
+        * Nota general 1: las imágenes y vídeos generados se guardan en la misma carpeta que contiene 
+            el script en ejecución
+        * Nota general 2: el tamaño de las ventanas no es representativo de la resolucion de las 
+            imagenes, las ventanas tienen esas dimensiones para faciliar su manejo y que no ocupen 
+            toda la pantalla
+        * Nota general 3: si se están pulsando las teclas "comando" y no hay respuesta en la consola 
+            con los mensajes correspondientes, puede que se haya perdido el focus de las ventanas del 
+            programa; con clickar sobre una de las ventanas debería bastar para poder introducir comandos
+            debidamente
+        * Nota general 4: si se ejecuta alguno de los scripts por consola y no haciendo doble click, 
+            hacer caso omiso del mensaje de "error" que aparece cuando se cierra el programa:
+
+                [ WARN:0] global C:\Users\appveyor\AppData\Local\Temp\1\pip-req-build-tts2sm8m\opencv
+                \modules\videoio\src\cap_msmf.cpp (435) `anonymous-namespace'::SourceReaderCB::
+                ~SourceReaderCB terminating async callback
+
+        * Nota general 5: los scripts pueden ser modificados si así se desea (disponemos de copias de 
+            seguridad de los scripts, así que total libertad en ese sentido)
