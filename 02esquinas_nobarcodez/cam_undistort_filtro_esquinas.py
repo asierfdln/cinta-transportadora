@@ -177,6 +177,9 @@ while cap_0.isOpened() and allgud:
         #######################
         #######################
 
+        frame_0_undistorted = cv2.resize(frame_0_undistorted, (window_WIDTH, window_HEIGHT))
+        cv2.imshow('CAM0 -- I/i o Espacio -> imagen | V/v o Enter -> video (play-pause) | Q/q o Esc -> Salir', frame_0_undistorted)
+
         keyCode = cv2.waitKey(1) & 0xFF
 
         if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
@@ -185,9 +188,6 @@ while cap_0.isOpened() and allgud:
         elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
             print('--- SALIMOS DEL PROGRAMA ---')
             break
-
-        frame_0_undistorted = cv2.resize(frame_0_undistorted, (window_WIDTH, window_HEIGHT))
-        cv2.imshow('CAM0 -- I/i o Espacio -> imagen | V/v o Enter -> video (play-pause) | Q/q o Esc -> Salir', frame_0_undistorted)
 
     else:
         print('--- UNA DE LAS CAMARAS HA FALLADO ---')

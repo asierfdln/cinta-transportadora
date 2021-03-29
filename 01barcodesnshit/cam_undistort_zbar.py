@@ -12,7 +12,7 @@ window_WIDTH = 1280
 window_HEIGHT = 720
 WIDTH = 1920
 HEIGHT = 1080
-cap_0 = cv2.VideoCapture(0)
+cap_0 = cv2.VideoCapture(1)
 cap_0.set(3, WIDTH)
 cap_0.set(4, HEIGHT)
 
@@ -90,19 +90,11 @@ while cap_0.isOpened() and allgud:
         frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
         ############################
 
-        keyCode = cv2.waitKey(1) & 0xFF
-
-        if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
-            print('--- SACAMOS FOTO ---')
-            cv2.imwrite(f'undistorted-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
-        elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
-            print('--- SALIMOS DEL PROGRAMA ---')
-            break
-
         # detectamos los codigos de barras
         possible_codez_in_box = pyzbar.decode(frame_0_undistorted)
         # procesamos la informacion de las coordenadas
         for codez in possible_codez_in_box:
+            count_detections += 1
             print("kipasa ketemos detectauuuuuuuuu")
             (x, y, w, h) = codez.rect
             cv2.rectangle(
@@ -142,6 +134,15 @@ while cap_0.isOpened() and allgud:
 
         frame_0_undistorted = cv2.resize(frame_0_undistorted, (window_WIDTH, window_HEIGHT))
         cv2.imshow('CAM0 -- I/i o Espacio -> imagen | V/v o Enter -> video (play-pause) | Q/q o Esc -> Salir', frame_0_undistorted)
+
+        keyCode = cv2.waitKey(1) & 0xFF
+
+        if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
+            print('--- SACAMOS FOTO ---')
+            cv2.imwrite(f'undistorted-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
+        elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
+            print('--- SALIMOS DEL PROGRAMA ---')
+            break
 
     else:
         print('--- UNA DE LAS CAMARAS HA FALLADO ---')
