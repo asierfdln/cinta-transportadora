@@ -9,13 +9,13 @@ import cv2
 #   TODO SABER DIFFS
 # 
 
-fondo = cv2.imread('fondo.png')
-caja = cv2.imread('caja.png')
-
+# cargamos fondo
+fondo = cv2.imread('fondo_cinta.png')
 fondo = cv2.blur(fondo, (5, 5))
+
+# creamos el backgroundsubstractor
+caja = cv2.imread('caja.png')
 caja = cv2.blur(caja, (5, 5))
-# fondo = cv2.GaussianBlur(fondo, (5, 5), 1.5)
-# caja = cv2.GaussianBlur(caja, (5, 5), 1.5)
 
 backSub = cv2.createBackgroundSubtractorMOG2(
     varThreshold=50, # wtfffffffffffffffffffff Mahalanobis distance sth sth
