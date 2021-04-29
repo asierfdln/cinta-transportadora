@@ -15,6 +15,7 @@ required_group = parser.add_argument_group(title='required arguments')
 required_group.add_argument("-c", "--clas", type=str, required=True, help="nombre de la clase para introducir en el dataset")
 required_group.add_argument("-d", "--directories", type=str, required=True, help="rutas de carpetas con las imagenes, definir separados por comas: path/num/1,path/num/2")
 parser.add_argument("-m", "--copy_or_move", type=int, default=0, choices= [0, 1], help="0 para copiar las fotos, 1 para moverlas")
+parser.add_argument("-t", "--add_test", type=bool, default=False, help="añadir una carpeta de imagenes para testeo")
 args = parser.parse_args()
 
 args.directories = args.directories.split(",")
@@ -32,7 +33,12 @@ if not flag_folders_bien:
     exit(1)
 
 padding = 7
-phase_folders = ["train", "val", "test"]
+if args.add_test == True:
+    phase_folders = ["train", "val", "test"]
+    print("[INFO] - seleccionado modo con subset de testeo")
+else:
+    phase_folders = ["train", "val"]
+    print("[INFO] - seleccionado modo sin subset de testeo")
 
 for phase_name in phase_folders:
     if not os.path.isdir(phase_name):
@@ -40,10 +46,6 @@ for phase_name in phase_folders:
     if not os.path.isdir(os.path.join(phase_name, args.clas)):
         os.mkdir(os.path.join(phase_name, args.clas))
 print("[INFO] - carpetas de etapas y clase creadas")
-
-####################################
-# --> se necesita un labels.txt??? #
-####################################
 
 for folder in args.directories:
 
@@ -53,24 +55,39 @@ for folder in args.directories:
             files.append(os.path.join(".", folder, f))
     print(f"[INFO] - {folder} - obtenidos los ficheros de la carpeta '{folder}'")
 
-    files_70 = random.sample(files, int(len(files) * 0.7))
-    # print(files_70)
-    # print(len(files_70))
-    _files_30 = list(set(files) - set(files_70))
-    # print(_files_30)
-    # print(len(_files_30))
-    files_20 = random.sample(_files_30, int(len(_files_30) * 0.67))
-    # print(files_20)
-    # print(len(files_20))
-    files_10 = list(set(_files_30) - set(files_20))
-    # print(files_10)
-    # print(len(files_10))
-    print(f"[INFO] - {folder} - reparto de imagenes para el dataset realizado")
+    if args.add_test == True:
+        files_70 = random.sample(files, int(len(files) * 0.7))
+        # print(files_70)
+        # print(len(files_70))
+        _files_30 = list(set(files) - set(files_70))
+        # print(_files_30)
+        # print(len(_files_30))
+        files_20 = random.sample(_files_30, int(len(_files_30) * 0.67))
+        # print(files_20)
+        # print(len(files_20))
+        files_10 = list(set(_files_30) - set(files_20))
+        # print(files_10)
+        # print(len(files_10))
 
-    files_list = [files_70, files_20, files_10]
-    counter_train = len(os.listdir(os.path.join(phase_folders[0], args.clas))) + 1
-    counter_val = len(os.listdir(os.path.join(phase_folders[1], args.clas)) )+ 1
-    counter_test = len(os.listdir(os.path.join(phase_folders[2], args.clas))) + 1
+        print(f"[INFO] - {folder} - reparto de imagenes para el dataset realizado")
+
+        files_list = [files_70, files_20, files_10]
+        counter_train = len(os.listdir(os.path.join(phase_folders[0], args.clas))) + 1
+        counter_val = len(os.listdir(os.path.join(phase_folders[1], args.clas)) )+ 1
+        counter_test = len(os.listdir(os.path.join(phase_folders[2], args.clas))) + 1
+    else:
+        files_80 = random.sample(files, int(len(files) * 0.8))
+        # print(files_80)
+        # print(len(files_80))
+        files_20 = list(set(files) - set(files_80))
+        # print(files_20)
+        # print(len(files_20))
+
+        print(f"[INFO] - {folder} - reparto de imagenes para el dataset realizado")
+
+        files_list = [files_80, files_20]
+        counter_train = len(os.listdir(os.path.join(phase_folders[0], args.clas))) + 1
+        counter_val = len(os.listdir(os.path.join(phase_folders[1], args.clas))) + 1
 
     for folder_files_couple in zip(phase_folders, files_list):
         for f in folder_files_couple[1]:
@@ -96,3 +113,7 @@ for folder in args.directories:
                 os.rename(f, os.path.join(*join_list))
 
     print(f"[INFO] - {folder} - dataset creado con exito")
+
+with open("labels.txt", "w") as f:
+    for clas in os.listdir(phase_folders[0]):
+        f.write(f"{clas}\n")
