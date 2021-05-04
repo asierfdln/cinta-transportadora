@@ -14,8 +14,8 @@ parser = argparse.ArgumentParser(description="Script para generar datasets de cl
 required_group = parser.add_argument_group(title='required arguments')
 required_group.add_argument("-c", "--clas", type=str, required=True, help="nombre de la clase para introducir en el dataset")
 required_group.add_argument("-d", "--directories", type=str, required=True, help="rutas de carpetas con las imagenes, definir separados por comas: path/num/1,path/num/2")
-parser.add_argument("-m", "--copy_or_move", type=int, default=0, choices= [0, 1], help="0 para copiar las fotos, 1 para moverlas")
-parser.add_argument("-t", "--add_test", type=bool, default=False, help="añadir una carpeta de imagenes para testeo")
+parser.add_argument("-m", "--copy_or_move", type=int, default=0, choices= [0, 1], help="(default 0) 0 para copiar las fotos, 1 para moverlas")
+parser.add_argument("-t", "--add_test", type=bool, default=False, choices=[True, False], help="(default False) añadir una carpeta de imagenes para testeo")
 args = parser.parse_args()
 
 args.directories = args.directories.split(",")
