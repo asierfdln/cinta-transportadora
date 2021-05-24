@@ -32,6 +32,15 @@ cv2.imshow('FG Mask', fg_mask)
 cv2.waitKey()
 cv2.destroyAllWindows()
 
+nada = backSub.apply(fondo, learningRate=1)
+fg_mask = backSub.apply(caja)
+
+cv2.imshow('og', nada)
+cv2.imshow('FG Mask', fg_mask)
+
+cv2.waitKey()
+cv2.destroyAllWindows()
+
 fg_mask_eroded = cv2.erode(fg_mask, None, iterations = 4) # https://docs.opencv.org/3.4/d4/d86/group__imgproc__filter.html#gaeb1e0c1033e3f6b891a25d0511362aeb
 fg_mask_dilated = cv2.dilate(fg_mask_eroded, None, iterations = 4) # https://docs.opencv.org/3.4/d4/d86/group__imgproc__filter.html#ga4ff0f3318642c4f469d0e11f242f3b6c
 

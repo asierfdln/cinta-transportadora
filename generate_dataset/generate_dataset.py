@@ -14,8 +14,8 @@ parser = argparse.ArgumentParser(description="Script para generar datasets de cl
 required_group = parser.add_argument_group(title='required arguments')
 required_group.add_argument("-c", "--clas", type=str, required=True, help="nombre de la clase para introducir en el dataset")
 required_group.add_argument("-d", "--directories", type=str, required=True, help="rutas de carpetas con las imagenes, definir separados por comas: path/num/1,path/num/2")
-parser.add_argument("-m", "--copy_or_move", type=int, default=0, choices= [0, 1], help="(default 0) 0 para copiar las fotos, 1 para moverlas")
-parser.add_argument("-t", "--add_test", type=bool, default=False, choices=[True, False], help="(default False) añadir una carpeta de imagenes para testeo")
+parser.add_argument("-m", "--copy_or_move", type=int, default=0, choices= [0, 1], help="(default: 0) 0 para copiar las fotos, 1 para moverlas")
+parser.add_argument("-t", "--add_test", type=bool, default=False, choices=[True, False], help="(default: False) añadir una carpeta de imagenes para testeo")
 args = parser.parse_args()
 
 args.directories = args.directories.split(",")
@@ -56,13 +56,13 @@ for folder in args.directories:
     print(f"[INFO] - {folder} - obtenidos los ficheros de la carpeta '{folder}'")
 
     if args.add_test == True:
-        files_70 = random.sample(files, int(len(files) * 0.7))
+        files_70 = random.sample(files, int(len(files) * 0.8))
         # print(files_70)
         # print(len(files_70))
         _files_30 = list(set(files) - set(files_70))
         # print(_files_30)
         # print(len(_files_30))
-        files_20 = random.sample(_files_30, int(len(_files_30) * 0.67))
+        files_20 = random.sample(_files_30, int(len(_files_30) * 0.9))
         # print(files_20)
         # print(len(files_20))
         files_10 = list(set(_files_30) - set(files_20))
@@ -115,5 +115,5 @@ for folder in args.directories:
     print(f"[INFO] - {folder} - dataset creado con exito")
 
 with open("labels.txt", "w") as f:
-    for clas in os.listdir(phase_folders[0]):
+    for clas in sorted(os.listdir(phase_folders[0])):
         f.write(f"{clas}\n")
