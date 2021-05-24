@@ -1,5 +1,7 @@
 __pycache__/*
 
+.vscode/*
+
 entrenar_buenas*/
 
 entrenar_malas*/
