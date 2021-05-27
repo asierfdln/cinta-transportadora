@@ -1,5 +1,3 @@
-# python3 cam_undistort_jutils.py --input_width=1920 --input_height=1080 --input_rate=30
-
 import cv2
 import json
 import numpy as np
@@ -8,14 +6,15 @@ from datetime import datetime
 
 import jetson.utils
 
-window_WIDTH = 1280
-window_HEIGHT = 720
+window_WIDTH = 1920
+window_HEIGHT = 1080
 WIDTH = 1920
 HEIGHT = 1080
-# cap_0 = cv2.VideoCapture(1)
-# cap_0.set(3, WIDTH)
-# cap_0.set(4, HEIGHT)
-cap_0 = jetson.utils.videoSource("/dev/video0", argv=sys.argv)
+
+sys.argv.append("--input_codec=mjpeg")
+sys.argv.append("--input_width=1920")
+sys.argv.append("--input_height=1080")
+cap_0 = jetson.utils.videoSource("/dev/video1", argv=sys.argv)
 
 allgud = True
 
@@ -86,11 +85,16 @@ else:
 
 print(f'Camera 0 specs: width {int(cap_0.GetWidth())} height {int(cap_0.GetHeight())}')
 
-cv2.waitKey()
-
 while allgud:
 
     frame_0 = cap_0.Capture()
+    print(frame_0.shape)    # (height,width,channels) tuple
+    print(frame_0.width)    # width in pixels
+    print(frame_0.height)   # height in pixels
+    print(frame_0.channels) # number of color channels
+    print(frame_0.format)   # format string --> rgb8 (cambia si le especificas un string, sin kwargs...)
+    print(frame_0.mapped)   # true if ZeroCopy --> True
+    print("···········")
 
     if frame_0:
 
@@ -135,19 +139,18 @@ while allgud:
 
         ############################
         # INTER_LINEAR y demas en hackaday.io
-        jetson.utils.cudaDeviceSynchronize()
+        jetson.utils.cudaDeviceSynchronize() # NECESARIO CHECK
         frame_0_cv2 = jetson.utils.cudaToNumpy(frame_0)
         frame_0_cv2_BGR = img_rgba = cv2.cvtColor(frame_0_cv2, cv2.COLOR_RGBA2BGR)
-        frame_0_undistorted = frame_0_cv2_BGR
-        # frame_0_undistorted = cv2.remap(
-        #     frame_0_cv2_BGR,
-        #     mapx_2,
-        #     mapy_2,
-        #     cv2.INTER_LINEAR
-        # )
-        # # crop the image
-        # x, y, w, h = roi_of_new_cam_matrix
-        # frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
+        frame_0_undistorted = cv2.remap(
+            frame_0_cv2_BGR,
+            mapx_2,
+            mapy_2,
+            cv2.INTER_LINEAR
+        )
+        # crop the image
+        x, y, w, h = roi_of_new_cam_matrix
+        frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
         ############################
 
         keyCode = cv2.waitKey(1) & 0xFF

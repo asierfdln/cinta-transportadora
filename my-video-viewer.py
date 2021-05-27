@@ -43,7 +43,7 @@ while output.IsStreaming():
     print(image.width)    # width in pixels
     print(image.height)   # height in pixels
     print(image.channels) # number of color channels
-    print(image.format)   # format string --> rgb8
+    print(image.format)   # format string --> rgb8 (cambia si le especificas un string, sin kwargs...)
     print(image.mapped)   # true if ZeroCopy --> True
     print("···········")
     output.Render(image)

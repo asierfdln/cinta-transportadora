@@ -34,7 +34,7 @@ output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
 # rgba32f 	        IMAGE_RGBA32F 	    float4 	    128
 
 # capture frames until user exits
-while output.IsStreaming():
+while ouput.IsStreaming():
     image = input.Capture()
     print(image.shape)    # (height,width,channels) tuple
     print(image.width)    # width in pixels

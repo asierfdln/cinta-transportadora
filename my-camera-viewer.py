@@ -7,9 +7,9 @@ import sys
 # parse the command line
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--width", type=int, default=1280, help="desired width of camera stream (default is 1280 pixels)")
-parser.add_argument("--height", type=int, default=720, help="desired height of camera stream (default is 720 pixels)")
-parser.add_argument("--camera", type=str, default="0", help="index of the MIPI CSI camera to use (NULL for CSI camera 0), or for VL42 cameras the /dev/video node to use (e.g. /dev/video0).  By default, MIPI CSI camera 0 will be used.")
+# parser.add_argument("--width", type=int, default=1280, help="desired width of camera stream (default is 1280 pixels)")
+# parser.add_argument("--height", type=int, default=720, help="desired height of camera stream (default is 720 pixels)")
+# parser.add_argument("--camera", type=str, default="0", help="index of the MIPI CSI camera to use (NULL for CSI camera 0), or for VL42 cameras the /dev/video node to use (e.g. /dev/video0).  By default, MIPI CSI camera 0 will be used.")
 
 opt = parser.parse_args()
 print(opt)
@@ -19,7 +19,7 @@ print(opt)
 display = jetson.utils.videoOutput("", argv=sys.argv)
 
 # create camera device
-camera = jetson.utils.gstCamera(opt.width, opt.height, opt.camera)
+camera = jetson.utils.gstCamera(1280, 720, "0")
 
 # open the camera for streaming
 camera.Open()
@@ -38,7 +38,7 @@ while display.IsStreaming():
     print(image.width)    # width in pixels
     print(image.height)   # height in pixels
     print(image.channels) # number of color channels
-    print(image.format)   # format string --> rgba32f
+    print(image.format)   # format string --> rgba32f (nu puedes cambiarlo jeje)
     print(image.mapped)   # true if ZeroCopy) --> True
     print("···········")
     # display.RenderOnce(image, width, height)
