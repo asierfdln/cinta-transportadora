@@ -141,7 +141,7 @@ while allgud:
         # INTER_LINEAR y demas en hackaday.io
         jetson.utils.cudaDeviceSynchronize() # NECESARIO CHECK
         frame_0_cv2 = jetson.utils.cudaToNumpy(frame_0)
-        frame_0_cv2_BGR = img_rgba = cv2.cvtColor(frame_0_cv2, cv2.COLOR_RGBA2BGR)
+        frame_0_cv2_BGR = cv2.cvtColor(frame_0_cv2, cv2.COLOR_RGBA2BGR)
         frame_0_undistorted = cv2.remap(
             frame_0_cv2_BGR,
             mapx_2,
@@ -169,8 +169,6 @@ while allgud:
         print('--- UNA DE LAS CAMARAS HA FALLADO ---')
         break
 
-    if not cap_0.IsStreaming():
-        break
 
 cap_0.Close()
 cv2.destroyAllWindows()

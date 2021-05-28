@@ -1,0 +1,11 @@
+comprobar que el cam_undistort_jutils.py funciona sin el slipup...
+
+probar ttboy46_up_jutils.py en jetson
+
+if todo bien:
+  meter la clase de VideoGet en dos_jutils_videosource-thr.py
+    (dos_jutils_videosource.py funciona, no??...)
+else:
+  arreglar
+
+probar lo de interrupt con las gpios de la raspberrypi

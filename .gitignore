@@ -1,6 +1,6 @@
 __pycache__/*
 
-.vscode/*
+.vscode/
 
 entrenar_buenas*/
 
@@ -13,3 +13,5 @@ generate_dataset/val/
 generate_dataset/test/
 
 generate_dataset/labels.txt
+
+multithread_someguys/
