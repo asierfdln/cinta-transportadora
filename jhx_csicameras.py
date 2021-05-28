@@ -219,4 +219,5 @@ def start_cameras():
 
 
 if __name__ == "__main__":
-    start_cameras()
+    start_camera()
+    # start_cameras()
