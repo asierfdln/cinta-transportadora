@@ -24,7 +24,6 @@ class CSI_Camera:
         self.read_lock = threading.Lock()
         self.running = False
 
-
     def open(self, gstreamer_pipeline_string):
         try:
             self.video_capture = cv2.VideoCapture(
@@ -115,6 +114,51 @@ def gstreamer_pipeline(
             display_height,
         )
     )
+
+
+def start_camera():
+    left_camera = CSI_Camera()
+    left_camera.open(
+        gstreamer_pipeline(
+            sensor_id=0,
+            sensor_mode=3,
+            flip_method=0,
+            display_height=540,
+            display_width=960,
+        )
+    )
+    left_camera.start()
+    output = jetson.utils.videoOutput()
+
+    if (
+        not left_camera.video_capture.isOpened()
+    ):
+        # Cameras did not open, or no camera attached
+
+        print("Unable to open any cameras")
+        # TODO: Proper Cleanup
+        SystemExit(0)
+
+    while output.IsStreaming():
+
+        _ , left_image=left_camera.read()
+
+        left_image_rgba = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGBA)
+        jetson.utils.cudaDeviceSynchronize()
+        left_image_cuda = jetson.utils.cudaFromNumpy(left_image_rgba)
+
+        output.Render(left_image_cuda)
+        output.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image_cuda.width, left_image_cuda.height, output.GetFrameRate()))
+
+        # # This also acts as
+        # keyCode = cv2.waitKey(30) & 0xFF
+        # # Stop the program on the ESC key
+        # if keyCode == 27:
+        #     break
+
+    left_camera.stop()
+    left_camera.release()
+    cv2.destroyAllWindows()
 
 
 def start_cameras():
