@@ -2,6 +2,8 @@ import cv2
 import threading
 import numpy as np
 
+import jetson.utils
+
 # gstreamer_pipeline returns a GStreamer pipeline for capturing from the CSI camera
 # Flip the image by setting the flip_method (most common values: 0 and 2)
 # display_width and display_height determine the size of each camera pane in the window on the screen
