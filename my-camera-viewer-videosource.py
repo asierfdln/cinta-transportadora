@@ -22,6 +22,7 @@ except:
 sys.argv.append("--input_codec=mjpeg")
 sys.argv.append("--input_width=1920")
 sys.argv.append("--input_height=1080")
+sys.argv.append("--input_rate=60")
 
 # create video sources & outputs
 input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
@@ -34,7 +35,7 @@ output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
 # rgba32f 	        IMAGE_RGBA32F 	    float4 	    128
 
 # capture frames until user exits
-while ouput.IsStreaming():
+while output.IsStreaming():
     image = input.Capture()
     print(image.shape)    # (height,width,channels) tuple
     print(image.width)    # width in pixels
