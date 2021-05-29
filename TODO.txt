@@ -1,5 +1,7 @@
 jetson_stats, , vsc_code jhx, resizeSwapMemory, jetson-gpio, jetson-inference, people-counter, cinta_trans, cuda samples y visionworks samples
 
+mirar a ver si quitando lo de sensor id y sensor mode se arregla lo de cameracropping
+
 utilizar la clase de jhx de las camaras porque videoGet no funciona xDDDD
 
     ################
