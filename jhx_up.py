@@ -109,11 +109,11 @@ class CSI_Camera:
 # Here we directly select sensor_mode 3 (1280x720, 59.9999 fps)
 def gstreamer_pipeline(
     sensor_id=0,
-    sensor_mode=3,
-    capture_width=1280,
-    capture_height=720,
-    display_width=1280,
-    display_height=720,
+    sensor_mode=2,
+    capture_width=1920,
+    capture_height=1080,
+    display_width=1920,
+    display_height=1080,
     framerate=30,
     flip_method=0,
 ):
@@ -294,6 +294,6 @@ def start_csicamera_andusbvideosource():
 
 
 if __name__ == "__main__":
-    # start_camera()
+    start_camera()
     # start_cameras()
-    start_csicamera_andusbvideosource()
+    # start_csicamera_andusbvideosource()

@@ -124,9 +124,11 @@ def start_camera():
         gstreamer_pipeline(
             sensor_id=0,
             sensor_mode=3,
+            capture_width=1920,
+            capture_height=1080,
+            display_width=1920,
+            display_height=1080,
             flip_method=0,
-            # display_height=540,
-            # display_width=960,
         )
     )
     left_camera.start()
@@ -227,8 +229,6 @@ def start_csicamera_andusbvideosource():
             sensor_id=0,
             sensor_mode=3,
             flip_method=0,
-            # display_height=540,
-            # display_width=960,
         )
     )
     left_camera.start()
@@ -280,6 +280,6 @@ def start_csicamera_andusbvideosource():
 
 
 if __name__ == "__main__":
-    # start_camera()
+    start_camera()
     # start_cameras()
-    start_csicamera_andusbvideosource()
+    # start_csicamera_andusbvideosource()
