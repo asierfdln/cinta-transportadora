@@ -24,4 +24,28 @@ una vez funcione la clase de jhx con videosource, hacer que tenga la misma api q
 
 añadir a la clase de videogetUPYEAH --input_rate para csi por si acaso...
 
-AL FINAL TE TIENES QUE QUEDAR SOLO CON dos_jutils_videosource Y EL dos_jutils_videosource-thr
+AL FINAL TE TIENES QUE QUEDAR SOLO CON dos_jutils_videosource Y EL dos_thrcameracv
+
+palasdoscamras
+flip-method         : video flip methods
+                        flags: readable, writable, controllable
+                        Enum "GstNvVideoFlipMethod" Default: 0, "none"
+                           (0): none             - Identity (no rotation)
+                           (1): counterclockwise - Rotate counter-clockwise 90 degrees
+                           (2): rotate-180       - Rotate 180 degrees
+                           (3): clockwise        - Rotate clockwise 90 degrees
+                           (4): horizontal-flip  - Flip horizontally
+                           (5): upper-right-diagonal - Flip across upper right/lower left diagonal
+                           (6): vertical-flip    - Flip vertically
+                           (7): upper-left-diagonal - Flip across upper left/lower right diagonal
+
+WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT NVARGUSCAMERASRC
+  ee-mode             : property to select edge enhnacement mode
+                        flags: readable, writable
+                        Enum "GstNvArgusCamEEMode" Default: 1, "EdgeEnhancement_Fast"
+                           (0): EdgeEnhancement_Off - GST_NVCAM_EE_OFF
+                           (1): EdgeEnhancement_Fast - GST_NVCAM_EE_FAST
+                           (2): EdgeEnhancement_HighQuality - GST_NVCAM_EE_HIGHQUALITY
+  ee-strength         : property to adjust edge enhancement strength
+                        flags: readable, writable
+                        Float. Range: 
