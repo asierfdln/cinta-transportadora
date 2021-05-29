@@ -1,11 +1,25 @@
-comprobar que el cam_undistort_jutils.py funciona sin el slipup...
+utilizar la clase de jhx de las camaras porque videoGet no funciona xDDDD
 
-probar ttboy46_up_jutils.py en jetson
+    ################
+    # pensamientos #
+    ################
 
-if todo bien:
-  meter la clase de VideoGet en dos_jutils_videosource-thr.py
-    (dos_jutils_videosource.py funciona, no??...)
-else:
-  arreglar
+        hacer algo tal que asin en jhx_camera?? para cerrar las cosas y que no peten los threads y locks y asi:
 
-probar lo de interrupt con las gpios de la raspberrypi
+            def stop(self):
+                self.stopped = True
+
+            def release(self):
+                self.stop()
+                if self.thread != None:
+                    self.thread.join()
+                self.stream.Close()
+
+merge los metodos de init y open
+    en la definicion del constructor metes lo que esta puesto en open
+
+una vez funcione la clase de jhx con videosource, hacer que tenga la misma api que videosource (ttboy46_up_jutils-plusjhx.py)
+
+añadir a la clase de videogetUPYEAH --input_rate para csi por si acaso...
+
+AL FINAL TE TIENES QUE QUEDAR SOLO CON dos_jutils_videosource Y EL dos_jutils_videosource-thr

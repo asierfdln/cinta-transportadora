@@ -20,25 +20,28 @@ class CSI_Camera:
         self.video_capture = None
         # The last captured image from the camera
         self.frame = None
-        self.grabbed = False
         # The thread where the video capture runs
         self.read_thread = None
         self.read_lock = threading.Lock()
         self.running = False
 
-    def open(self, gstreamer_pipeline_string):
+    def open(self, uri="csi://0", input_codec="mjpeg", input_width="1920", input_height="1080"):
         try:
-            self.video_capture = cv2.VideoCapture(
-                gstreamer_pipeline_string, cv2.CAP_GSTREAMER
+            self.video_capture = jetson.utils.videoSource(
+                uri,
+                argv= [
+                    f"--input_codec={input_codec}",
+                    f"--input_width={input_width}",
+                    f"--input_height={input_height}",
+                ]
             )
-            
         except RuntimeError:
             self.video_capture = None
             print("Unable to open camera")
-            print("Pipeline: " + gstreamer_pipeline_string)
+            print(f"Attrs -> uri: {uri} | codec: {input_codec} | width: {input_width} | height: {input_height}")
             return
         # Grab the first frame to start the video capturing
-        self.grabbed, self.frame = self.video_capture.read()
+        self.frame = self.video_capture.Capture()
 
     def start(self):
         if self.running:
@@ -59,9 +62,8 @@ class CSI_Camera:
         # This is the thread to read images from the camera
         while self.running:
             try:
-                grabbed, frame = self.video_capture.read()
+                frame = self.video_capture.Capture()
                 with self.read_lock:
-                    self.grabbed=grabbed
                     self.frame=frame
             except RuntimeError:
                 print("Could not read image from camera")
@@ -69,19 +71,38 @@ class CSI_Camera:
         # Something bad happened
         
 
-    def read(self):
-        with self.read_lock:
-            frame = self.frame.copy()
-            grabbed=self.grabbed
-        return grabbed, frame
+    def read(self, np_copy_plz=False): # claro, esto siempre y cuando se puedan hacer las briguerias de multiweas bien, si no secuencial y a correr
+        if np_copy_plz:
+            with self.read_lock:
+                # frame = self.frame
+                frame_numpyfromcuda = jetson.utils.cudaToNumpy(self.frame) # self.frame se queda como la cudaImage
+                frame_numpyfromcuda_copied = np.copy(frame_numpyfromcuda)
+                # las dos lineas de arriba se pueden juntar?? frame_numpyfromcuda_copied = np.copy(jetson.utils.cudaToNumpy(self.frame))
+            return frame_numpyfromcuda_copied # return completely new image
+        else:
+            with self.read_lock:
+                frame = self.frame
+            return frame # return reference to cudaImage
+
 
     def release(self):
         if self.video_capture != None:
-            self.video_capture.release()
+            self.video_capture.Close()
             self.video_capture = None
         # Now kill the thread
         if self.read_thread != None:
             self.read_thread.join()
+
+        #############################
+        # def stop(self):
+        #     self.stopped = True
+
+        # def release(self):
+        #     self.stop()
+        #     if self.thread != None:
+        #         self.thread.join()
+        #     self.video_capture.Close()
+        #############################
 
 
 # Currently there are setting frame rate on CSI Camera on Nano through gstreamer
@@ -121,19 +142,17 @@ def gstreamer_pipeline(
 def start_camera():
     left_camera = CSI_Camera()
     left_camera.open(
-        gstreamer_pipeline(
-            sensor_id=0,
-            sensor_mode=3,
-            flip_method=0,
-            # display_height=540,
-            # display_width=960,
-        )
+        # uri="csi://0",
+        # uri="v4l2:///dev/video1",
+        input_codec="mjpeg",
+        input_width="1920",
+        input_height="1080"
     )
     left_camera.start()
     output = jetson.utils.videoOutput()
 
     if (
-        not left_camera.video_capture.isOpened()
+        not left_camera.video_capture.IsStreaming()
     ):
         # Cameras did not open, or no camera attached
 
@@ -143,14 +162,16 @@ def start_camera():
 
     while output.IsStreaming():
 
-        _ , left_image=left_camera.read()
-
-        left_image_rgba = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGBA)
-        jetson.utils.cudaDeviceSynchronize()
-        left_image_cuda = jetson.utils.cudaFromNumpy(left_image_rgba)
-
-        output.Render(left_image_cuda)
-        output.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image_cuda.width, left_image_cuda.height, output.GetFrameRate()))
+        left_image=left_camera.read()
+        # print(left_image.shape)    # (height,width,channels) tuple
+        # print(left_image.width)    # width in pixels
+        # print(left_image.height)   # height in pixels
+        # print(left_image.channels) # number of color channels
+        # print(left_image.format)   # format string --> rgb8 (cambia si le especificas un string, sin kwargs...)
+        # print(left_image.mapped)   # true if ZeroCopy --> True
+        # print("···········")
+        output.Render(left_image)
+        output.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image.width, left_image.height, output.GetFrameRate()))
 
         # # This also acts as
         # keyCode = cv2.waitKey(30) & 0xFF
@@ -223,30 +244,27 @@ def start_cameras():
 def start_csicamera_andusbvideosource():
     left_camera = CSI_Camera()
     left_camera.open(
-        gstreamer_pipeline(
-            sensor_id=0,
-            sensor_mode=3,
-            flip_method=0,
-            # display_height=540,
-            # display_width=960,
-        )
+        uri="csi://0",
+        input_codec="mjpeg",
+        input_width="1920",
+        input_height="1080"
     )
     left_camera.start()
     output_csi = jetson.utils.videoOutput()
 
-    right_camera = jetson.utils.videoSource(
-        "v4l2:///dev/video1",
-        argv = [
-            "--input_codec=mjpeg",
-            "--input_width=1920",
-            "--input_height=1080",
-        ]
+    right_camera = CSI_Camera()
+    right_camera.open(
+        uri="v4l2:///dev/video1",
+        input_codec="mjpeg",
+        input_width="1920",
+        input_height="1080"
     )
+    right_camera.start()
     output_usb = jetson.utils.videoOutput()
 
     if (
-        not left_camera.video_capture.isOpened()
-        or not right_camera.IsStreaming()
+        not left_camera.video_capture.IsStreaming()
+        or not right_camera.video_capture.IsStreaming()
     ):
         # Cameras did not open, or no camera attached
 
@@ -256,14 +274,11 @@ def start_csicamera_andusbvideosource():
 
     while output_csi.IsStreaming():
 
-        _ , left_image=left_camera.read()
-        left_image_rgba = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGBA)
-        jetson.utils.cudaDeviceSynchronize()
-        left_image_cuda = jetson.utils.cudaFromNumpy(left_image_rgba)
-        output_csi.Render(left_image_cuda)
-        output_csi.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image_cuda.width, left_image_cuda.height, output_csi.GetFrameRate()))
+        left_image=left_camera.read()
+        output_csi.Render(left_image)
+        output_csi.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image.width, left_image.height, output_csi.GetFrameRate()))
 
-        right_image=right_camera.Capture()
+        right_image=right_camera.read()
         output_usb.Render(right_image)
         output_usb.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(right_image.width, right_image.height, output_usb.GetFrameRate()))
 
@@ -273,8 +288,7 @@ def start_csicamera_andusbvideosource():
         if keyCode == 27:
             break
 
-    left_camera.stop()
-    left_camera.release()
+    left_camera.Close()
     right_camera.Close()
     cv2.destroyAllWindows()
 
