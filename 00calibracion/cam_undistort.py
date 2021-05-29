@@ -4,6 +4,8 @@ import numpy as np
 import sys
 from datetime import datetime
 
+import jetson.utils
+
 
 window_WIDTH = 1920
 window_HEIGHT = 1080
@@ -17,9 +19,10 @@ HEIGHT = 1080
 # cap_0 = cv2.VideoCapture(0)
 # cap_0 = cv2.VideoCapture(0, cv2.CAP_GSTREAMER)
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! video/x-raw, width=1280, height=720 ! videoconvert ! appsink")
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1280, height=720 ! videoconvert ! appsink")
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! video/x-raw, width=1280, height=720 ! videoconvert ! appsink", cv2.CAP_GSTREAMER)
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! video/x-raw, width=1280, height=720 ! videoconvert ! video/x-raw,format=BGR ! appsink")
-# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! video/x-raw, width=1280, height=720 ! videoconvert ! video/x-raw,format=BGR ! appsink", cv2.CAP_GSTREAMER)
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1280, height=720, format=BGRx ! videoconvert ! video/x-raw,format=BGR ! appsink", cv2.CAP_GSTREAMER)
 
 # mmmh no funcionan porque "could not link h264parse0 to appsink0, h264parse0 can't handle caps video/x-raw"
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! video/x-h264, width=(int)1280, height=(int)720 ! h264parse ! video/x-raw ! appsink")
@@ -30,10 +33,13 @@ HEIGHT = 1080
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! video/x-h264, width=(int)1280, height=(int)720 ! h264parse ! omxh264dec ! video/x-raw ! appsink", cv2.CAP_GSTREAMER)
 
 # FUNXIONAN PERO ALGO DE BLOCKING MODE??????  y si les quitas lo de appsink drop=1 a appsink va con un poco de lag...
-# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ")
-# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ", cv2.CAP_GSTREAMER)
-# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 io-mode=2 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ")
-# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 io-mode=2 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ", cv2.CAP_GSTREAMER)
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ")
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink")
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1")
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink", cv2.CAP_GSTREAMER)
+cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 io-mode=2 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ")
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 io-mode=2 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ", cv2.CAP_GSTREAMER)
 
 # FUNXIONAN PERO CON ALGO MENOS DE FPS...
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video0 ! jpegparse ! jpegdec ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ")
@@ -138,8 +144,9 @@ else:
 
 
 print(f'Camera 0 specs: width {int(cap_0.get(3))} height {int(cap_0.get(4))}')
+output = jetson.utils.videoOutput()
 
-while cap_0.isOpened() and allgud:
+while cap_0.isOpened() and allgud and output.IsStreaming():
 
     retval_0, frame_0 = cap_0.read()
 
@@ -197,17 +204,21 @@ while cap_0.isOpened() and allgud:
         frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
         ############################
 
-        keyCode = cv2.waitKey(1) & 0xFF
+        # keyCode = cv2.waitKey(1) & 0xFF
+        # if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
+        #     print('--- SACAMOS FOTO ---')
+        #     cv2.imwrite(f'entrenar_malas_3/undistorted-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
+        # elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
+        #     print('--- SALIMOS DEL PROGRAMA ---')
+        #     break
 
-        if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
-            print('--- SACAMOS FOTO ---')
-            cv2.imwrite(f'entrenar_malas_3/undistorted-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
-        elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
-            print('--- SALIMOS DEL PROGRAMA ---')
-            break
+        # frame_0_undistorted = cv2.resize(frame_0_undistorted, (window_WIDTH, window_HEIGHT))
+        # cv2.imshow('CAM0 -- I/i o Espacio -> imagen | V/v o Enter -> video (play-pause) | Q/q o Esc -> Salir', frame_0_undistorted)
 
-        frame_0_undistorted = cv2.resize(frame_0_undistorted, (window_WIDTH, window_HEIGHT))
-        cv2.imshow('CAM0 -- I/i o Espacio -> imagen | V/v o Enter -> video (play-pause) | Q/q o Esc -> Salir', frame_0_undistorted)
+        frame_0_undistorted = cv2.cvtColor(frame_0_undistorted, cv2.COLOR_BGR2RGBA)
+        image_undistorted = jetson.utils.cudaFromNumpy(frame_0_undistorted)
+        output.Render(image_undistorted)
+        output.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(image_undistorted.width, image_undistorted.height, output.GetFrameRate()))
 
     else:
         print('--- UNA DE LAS CAMARAS HA FALLADO ---')
