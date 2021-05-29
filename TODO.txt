@@ -1,4 +1,4 @@
-jetson_stats, resizeSwapMemory, jetson-gpio, jetson-inference, people-counter, cinta_trans, cuda samples y visionworks samples
+jetson_stats, , vsc_code jhx, resizeSwapMemory, jetson-gpio, jetson-inference, people-counter, cinta_trans, cuda samples y visionworks samples
 
 utilizar la clase de jhx de las camaras porque videoGet no funciona xDDDD
 
