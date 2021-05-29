@@ -37,7 +37,15 @@ HEIGHT = 1080
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink")
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1")
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink", cv2.CAP_GSTREAMER)
-cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
+###########################################################################################################################################################################################################################################
+###########################################################################################################################################################################################################################################
+###########################################################################################################################################################################################################################################
+###########################################################################################################################################################################################################################################
+# cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER)
+###########################################################################################################################################################################################################################################
+###########################################################################################################################################################################################################################################
+###########################################################################################################################################################################################################################################
+###########################################################################################################################################################################################################################################
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 io-mode=2 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ")
 # cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 io-mode=2 ! jpegparse ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1 ", cv2.CAP_GSTREAMER)
 
@@ -75,6 +83,27 @@ cap_0 = cv2.VideoCapture("v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! n
 # cap_0.set(3, WIDTH)
 # cap_0.set(4, HEIGHT)
 #########################
+
+def gstreamer_pipeline_usb(
+    sensor_id=1,
+    capture_width=1920,
+    capture_height=1080,
+    framerate=30,
+):
+    return (
+        "v4l2src device=/dev/video%d ! "
+        "nvv4l2decoder mjpeg=1 ! nvvidconv ! "
+        "video/x-raw, width=%d, height=%d, framerate=%d/1, format=BGRx ! "
+        "videoconvert ! video/x-raw, format=BGR ! appsink drop=1"
+        % (
+            sensor_id,
+            capture_width,
+            capture_height,
+            framerate,
+        )
+    )
+
+cap_0 = cv2.VideoCapture(gstreamer_pipeline_usb(), cv2.CAP_GSTREAMER)
 
 allgud = True
 
