@@ -113,6 +113,27 @@ def gstreamer_pipeline(
         )
     )
 
+def gstreamer_pipeline_usb(
+    sensor_id=1,
+    flip_method=0,
+    capture_width=1920,
+    capture_height=1080,
+    framerate=30,
+):
+    return (
+        "v4l2src device=/dev/video%d ! "
+        "nvv4l2decoder mjpeg=1 ! nvvidconv flip-method=%d ! "
+        "video/x-raw, width=%d, height=%d, framerate=%d/1, format=BGRx ! "
+        "videoconvert ! video/x-raw, format=BGR ! appsink drop=1"
+        % (
+            sensor_id,
+            flip_method,
+            capture_width,
+            capture_height,
+            framerate,
+        )
+    )
+
 
 def start_camera():
     left_camera = CSI_Camera()
@@ -120,10 +141,11 @@ def start_camera():
         gstreamer_pipeline(
             capture_width=1920,
             capture_height=1080,
-            display_width=1920,
-            display_height=1080,
+            display_width=1280,
+            display_height=720,
             flip_method=0,
         )
+        # gstreamer_pipeline_usb()
     )
     left_camera.start()
     output = jetson.utils.videoOutput()
@@ -149,7 +171,7 @@ def start_camera():
         output.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image_cuda.width, left_image_cuda.height, output.GetFrameRate()))
 
         # # This also acts as
-        # keyCode = cv2.waitKey(30) & 0xFF
+        # keyCode = cv2.waitKey(5) & 0xFF
         # # Stop the program on the ESC key
         # if keyCode == 27:
         #     break
@@ -216,31 +238,33 @@ def start_cameras():
     cv2.destroyAllWindows()
 
 
-def start_csicamera_andusbvideosource():
+def start_csicamera_andusbcamera():
     left_camera = CSI_Camera()
     left_camera.open(
         gstreamer_pipeline(
-            # sensor_id=0,
-            # sensor_mode=3,
+            capture_width=1280,
+            capture_height=720,
+            display_width=1280,
+            display_height=720,
             flip_method=0,
         )
     )
     left_camera.start()
     output_csi = jetson.utils.videoOutput()
 
-    right_camera = jetson.utils.videoSource(
-        "v4l2:///dev/video1",
-        argv = [
-            "--input_codec=mjpeg",
-            "--input_width=1920",
-            "--input_height=1080",
-        ]
+    right_camera = CSI_Camera()
+    right_camera.open(
+        gstreamer_pipeline_usb(
+            capture_width=1280,
+            capture_height=720
+        )
     )
+    right_camera.start()
     output_usb = jetson.utils.videoOutput()
 
     if (
         not left_camera.video_capture.isOpened()
-        or not right_camera.IsStreaming()
+        or not right_camera.video_capture.isOpened()
     ):
         # Cameras did not open, or no camera attached
 
@@ -248,32 +272,36 @@ def start_csicamera_andusbvideosource():
         # TODO: Proper Cleanup
         SystemExit(0)
 
-    while output_csi.IsStreaming():
+    while output_csi.IsStreaming() and output_usb.IsStreaming():
 
         _ , left_image=left_camera.read()
         left_image_rgba = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGBA)
-        jetson.utils.cudaDeviceSynchronize()
+        # jetson.utils.cudaDeviceSynchronize()
         left_image_cuda = jetson.utils.cudaFromNumpy(left_image_rgba)
         output_csi.Render(left_image_cuda)
         output_csi.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image_cuda.width, left_image_cuda.height, output_csi.GetFrameRate()))
 
-        right_image=right_camera.Capture()
-        output_usb.Render(right_image)
-        output_usb.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(right_image.width, right_image.height, output_usb.GetFrameRate()))
+        _ , right_image=right_camera.read()
+        right_image_rgba = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGBA)
+        # jetson.utils.cudaDeviceSynchronize()
+        right_image_cuda = jetson.utils.cudaFromNumpy(right_image_rgba)
+        output_usb.Render(right_image_cuda)
+        output_usb.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(right_image_cuda.width, right_image_cuda.height, output_usb.GetFrameRate()))
 
-        # This also acts as
-        keyCode = cv2.waitKey(30) & 0xFF
-        # Stop the program on the ESC key
-        if keyCode == 27:
-            break
+        # # This also acts as
+        # keyCode = cv2.waitKey(5) & 0xFF
+        # # Stop the program on the ESC key
+        # if keyCode == 27:
+        #     break
 
     left_camera.stop()
     left_camera.release()
-    right_camera.Close()
+    right_camera.stop()
+    right_camera.release()
     cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
-    start_camera()
+    # start_camera()
     # start_cameras()
-    # start_csicamera_andusbvideosource()
+    start_csicamera_andusbcamera()

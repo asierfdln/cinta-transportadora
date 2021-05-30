@@ -6,17 +6,19 @@ def _gst_str(self):
 
 def gstreamer_pipeline_usb(
     sensor_id=1,
+    flip_method=0,
     capture_width=1920,
     capture_height=1080,
     framerate=30,
 ):
     return (
         "v4l2src device=/dev/video%d ! "
-        "nvv4l2decoder mjpeg=1 ! nvvidconv ! "
+        "nvv4l2decoder mjpeg=1 ! nvvidconv flip-method=%d ! "
         "video/x-raw, width=%d, height=%d, framerate=%d/1, format=BGRx ! "
         "videoconvert ! video/x-raw, format=BGR ! appsink drop=1"
         % (
             sensor_id,
+            flip_method,
             capture_width,
             capture_height,
             framerate,
@@ -28,10 +30,10 @@ def gstreamer_pipeline_csi(
     sensor_mode=3,
     capture_width=1280,
     capture_height=720,
-    display_width=1280,
-    display_height=720,
     framerate=30,
     flip_method=0,
+    display_width=1280,
+    display_height=720,
 ):
     return (
         "nvarguscamerasrc sensor-id=%d sensor-mode=%d ! "
