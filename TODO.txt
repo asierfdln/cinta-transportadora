@@ -2,6 +2,8 @@ jetson_stats, , vsc_code jhx, resizeSwapMemory, jetson-gpio, jetson-inference, p
 
 mirar a ver si quitando lo de sensor id y sensor mode se arregla lo de cameracropping
 
+meter el gstreamerusb en jhx_* y cambiar el nombre de la funcinon de gstreamer
+
 utilizar la clase de jhx de las camaras porque videoGet no funciona xDDDD
 
     ################
