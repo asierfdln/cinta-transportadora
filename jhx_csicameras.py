@@ -4,7 +4,7 @@ import numpy as np
 
 import jetson.utils
 
-# gstreamer_pipeline returns a GStreamer pipeline for capturing from the CSI camera
+# gstreamer_pipeline_csi returns a GStreamer pipeline for capturing from the CSI camera
 # Flip the image by setting the flip_method (most common values: 0 and 2)
 # display_width and display_height determine the size of each camera pane in the window on the screen
 
@@ -86,15 +86,15 @@ class CSI_Camera:
 
 # Currently there are setting frame rate on CSI Camera on Nano through gstreamer
 # Here we directly select sensor_mode 3 (1280x720, 59.9999 fps)
-def gstreamer_pipeline(
+def gstreamer_pipeline_csi(
     sensor_id=0,
     sensor_mode=3,
     capture_width=1280,
     capture_height=720,
-    display_width=1280,
-    display_height=720,
     framerate=30,
     flip_method=0,
+    display_width=1280,
+    display_height=720,
 ):
     return (
         "nvarguscamerasrc sensor-id=%d sensor-mode=%d ! "
@@ -104,7 +104,8 @@ def gstreamer_pipeline(
         "nvvidconv flip-method=%d ! "
         "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
         "videoconvert ! "
-        "video/x-raw, format=(string)BGR ! appsink"
+        # "video/x-raw, format=(string)BGR ! " # este sobra un poco CHECK
+        "appsink"
         % (
             sensor_id,
             sensor_mode,
@@ -128,7 +129,9 @@ def gstreamer_pipeline_usb(
         "v4l2src device=/dev/video%d ! "
         "nvv4l2decoder mjpeg=1 ! nvvidconv flip-method=%d ! "
         "video/x-raw, width=%d, height=%d, framerate=%d/1, format=BGRx ! "
-        "videoconvert ! video/x-raw, format=BGR ! appsink drop=1"
+        "videoconvert ! "
+        # "video/x-raw, format=BGR ! " # sobra un poco CHECK
+        "appsink drop=1"
         % (
             sensor_id,
             flip_method,
@@ -142,17 +145,17 @@ def gstreamer_pipeline_usb(
 def start_camera():
     left_camera = CSI_Camera()
     left_camera.open(
-        gstreamer_pipeline(
-            # capture_width=1920,
-            # capture_height=1080,
-            # display_width=1280,
-            # display_height=720,
-            # flip_method=0,
-            sensor_id=0,
-            sensor_mode=3,
-            flip_method=0,
-        )
-        # gstreamer_pipeline_usb()
+        # gstreamer_pipeline_csi(
+        #     # capture_width=1920,
+        #     # capture_height=1080,
+        #     # display_width=1280,
+        #     # display_height=720,
+        #     # flip_method=0,
+        #     sensor_id=0,
+        #     sensor_mode=3,
+        #     flip_method=0,
+        # )
+        gstreamer_pipeline_usb()
     )
     left_camera.start()
     output = jetson.utils.videoOutput()
@@ -191,7 +194,7 @@ def start_camera():
 def start_cameras():
     left_camera = CSI_Camera()
     left_camera.open(
-        gstreamer_pipeline(
+        gstreamer_pipeline_csi(
             sensor_id=0,
             sensor_mode=3,
             flip_method=0,
@@ -203,7 +206,7 @@ def start_cameras():
 
     right_camera = CSI_Camera()
     right_camera.open(
-        gstreamer_pipeline(
+        gstreamer_pipeline_csi(
             sensor_id=1,
             sensor_mode=3,
             flip_method=0,
@@ -248,11 +251,9 @@ def start_cameras():
 def start_csicamera_andusbcamera():
     left_camera = CSI_Camera()
     left_camera.open(
-        gstreamer_pipeline(
-            capture_width=1280,
-            capture_height=720,
-            display_width=1280,
-            display_height=720,
+        gstreamer_pipeline_csi(
+            sensor_id=0,
+            sensor_mode=3,
             flip_method=0,
         )
     )

@@ -1,9 +1,3 @@
-def _gst_str(self):
-        return 'v4l2src device=/dev/video{} ! video/x-raw, width=(int){}, height=(int){}, framerate=(fraction){}/1 ! videoconvert !  video/x-raw, format=(string)BGR ! appsink'.format(self.capture_device, self.capture_width, self.capture_height, self.capture_fps)
-    
-
-"v4l2src device=/dev/video1 ! nvv4l2decoder mjpeg=1 ! nvvidconv ! video/x-raw, width=1920, height=1080, framerate=30/1, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink drop=1", cv2.CAP_GSTREAMER
-
 def gstreamer_pipeline_usb(
     sensor_id=1,
     flip_method=0,
@@ -15,7 +9,9 @@ def gstreamer_pipeline_usb(
         "v4l2src device=/dev/video%d ! "
         "nvv4l2decoder mjpeg=1 ! nvvidconv flip-method=%d ! "
         "video/x-raw, width=%d, height=%d, framerate=%d/1, format=BGRx ! "
-        "videoconvert ! video/x-raw, format=BGR ! appsink drop=1"
+        "videoconvert ! "
+        # "video/x-raw, format=BGR ! " # sobra un poco CHECK
+        "appsink drop=1"
         % (
             sensor_id,
             flip_method,
@@ -43,7 +39,8 @@ def gstreamer_pipeline_csi(
         "nvvidconv flip-method=%d ! "
         "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
         "videoconvert ! "
-        "video/x-raw, format=(string)BGR ! appsink"
+        # "video/x-raw, format=(string)BGR ! " # este sobra un poco CHECK
+        "appsink"
         % (
             sensor_id,
             sensor_mode,
