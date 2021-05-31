@@ -1,6 +1,14 @@
 jetson_stats, , vsc_code jhx, resizeSwapMemory, jetson-gpio, jetson-inference, people-counter, cinta_trans, cuda samples y visionworks samples
 
-mirar a ver si quitando lo de sensor id y sensor mode se arregla lo de cameracropping
+VAMOS A RESIZEAR EL USB DESDE gstreamer
+
+    #################        ###################################
+    #     TO-DO     #   =>   #     RESIZE EL OUTPUT DE USB     #
+    #################        ###################################
+
+    no entiendo muy bien porque el videoconvert o el nvvidonv no funxionan para resizear el video...
+
+    quitar (ints) y (strings)
 
 meter el gstreamerusb en jhx_* y cambiar el nombre de la funcinon de gstreamer
 
