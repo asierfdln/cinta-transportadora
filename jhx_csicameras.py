@@ -191,7 +191,7 @@ def start_camera():
     cv2.destroyAllWindows()
 
 
-def start_cameras():
+def start_two_cameras():
     left_camera = CSI_Camera()
     left_camera.open(
         gstreamer_pipeline_csi(
@@ -309,7 +309,92 @@ def start_csicamera_andusbcamera():
     cv2.destroyAllWindows()
 
 
+def start_three_cameras():
+    left_camera = CSI_Camera()
+    left_camera.open(
+        gstreamer_pipeline_csi(
+            sensor_id=0,
+            sensor_mode=3,
+            flip_method=0,
+            display_width=800,
+            display_height=600,
+        )
+    )
+    left_camera.start()
+    output_csi = jetson.utils.videoOutput()
+
+    right_camera = CSI_Camera()
+    right_camera.open(
+        gstreamer_pipeline_usb(
+            sensor_id=1,
+            capture_width=800,
+            capture_height=600
+        )
+    )
+    right_camera.start()
+    output_usb = jetson.utils.videoOutput()
+
+    third_camera = CSI_Camera()
+    third_camera.open(
+        gstreamer_pipeline_usb(
+            sensor_id=2,
+            capture_width=800,
+            capture_height=600
+        )
+    )
+    third_camera.start()
+    output_usb3 = jetson.utils.videoOutput()
+
+    if (
+        not left_camera.video_capture.isOpened()
+        or not right_camera.video_capture.isOpened()
+        or not third_camera.video_capture.isOpened()
+    ):
+        # Cameras did not open, or no camera attached
+
+        print("Unable to open any cameras")
+        # TODO: Proper Cleanup
+        SystemExit(0)
+
+    while output_csi.IsStreaming() and output_usb.IsStreaming() and output_usb3.IsStreaming():
+
+        _ , left_image=left_camera.read()
+        left_image_rgba = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGBA)
+        # jetson.utils.cudaDeviceSynchronize() # NO HACE FALTA CHECK
+        left_image_cuda = jetson.utils.cudaFromNumpy(left_image_rgba)
+        output_csi.Render(left_image_cuda)
+        output_csi.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(left_image_cuda.width, left_image_cuda.height, output_csi.GetFrameRate()))
+
+        _ , right_image=right_camera.read()
+        right_image_rgba = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGBA)
+        # jetson.utils.cudaDeviceSynchronize() # NO HACE FALTA CHECK
+        right_image_cuda = jetson.utils.cudaFromNumpy(right_image_rgba)
+        output_usb.Render(right_image_cuda)
+        output_usb.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(right_image_cuda.width, right_image_cuda.height, output_usb.GetFrameRate()))
+
+        _ , third_image=third_camera.read()
+        third_image_rgba = cv2.cvtColor(third_image, cv2.COLOR_BGR2RGBA)
+        # jetson.utils.cudaDeviceSynchronize() # NO HACE FALTA CHECK
+        third_image_cuda = jetson.utils.cudaFromNumpy(third_image_rgba)
+        output_usb3.Render(third_image_cuda)
+        output_usb3.SetStatus("Video Viewer | {:d}x{:d} | {:.1f} FPS".format(third_image_cuda.width, third_image_cuda.height, output_usb3.GetFrameRate()))
+
+        # # This also acts as
+        # keyCode = cv2.waitKey(5) & 0xFF
+        # # Stop the program on the ESC key
+        # if keyCode == 27:
+        #     break
+
+    left_camera.stop()
+    left_camera.release()
+    right_camera.stop()
+    right_camera.release()
+    third_camera.stop()
+    third_camera.release()
+    cv2.destroyAllWindows()
+
+
 if __name__ == "__main__":
     start_camera()
-    # start_cameras()
-    # start_csicamera_andusbcamera()
+    # start_two_cameras()
+    # start_three_cameras()
