@@ -10,6 +10,18 @@ VAMOS A RESIZEAR EL USB DESDE gstreamer
 
     quitar (ints) y (strings)
 
+    el pesao del neilyoung says:
+
+        gst-launch-1.0 v4l2src device=/dev/video0 
+        ! "image/jpeg,width=1280,height=720,framerate=30/1" 
+        ! jpegdec 
+        ! videoconvert 
+        ! nvvideoconvert 
+        ! "video/x-raw(memory:NVMM),fromat=NV12" 
+        ! m.sink_0 nvstreammux name=m batch-size=1 width=640 height=480 
+        ! nvinfer config-file-path=/opt/nvidia/deepstream/deepstream-5.0/samples/configs/deepstream-app/config_infer_primary.txt 
+        ! fakesink
+
 meter el gstreamerusb en jhx_* y cambiar el nombre de la funcinon de gstreamer
 
 utilizar la clase de jhx de las camaras porque videoGet no funciona xDDDD
@@ -29,14 +41,12 @@ utilizar la clase de jhx de las camaras porque videoGet no funciona xDDDD
                     self.thread.join()
                 self.stream.Close()
 
-merge los metodos de init y open
-    en la definicion del constructor metes lo que esta puesto en open
+una vez ya este la clase de CSI_CAMERA bien, hacer que tenga la misma api que OPENCV (constructor, read(), isOpened, release())
 
-una vez funcione la clase de jhx con videosource, hacer que tenga la misma api que videosource (ttboy46_up_jutils-plusjhx.py)
+    merge los metodos de init y open
+        en la definicion del constructor metes lo que esta puesto en open
 
 añadir a la clase de videogetUPYEAH --input_rate para csi por si acaso...
-
-AL FINAL TE TIENES QUE QUEDAR SOLO CON dos_jutils_videosource Y EL dos_thrcameracv
 
 palasdoscamras
 flip-method         : video flip methods
