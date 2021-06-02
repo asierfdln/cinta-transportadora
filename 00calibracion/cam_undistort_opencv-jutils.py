@@ -190,7 +190,6 @@ while cap_0.isOpened() and allgud and output.IsStreaming():
         ############################
 
 
-
         ############################
         # # undistort streitup (None no se utiliza en python)
         # frame_0_undistorted = cv2.undistort(

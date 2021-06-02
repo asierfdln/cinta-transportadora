@@ -105,7 +105,6 @@ while allgud:
         ############################
 
 
-
         ############################
         # # undistort streitup (None no se utiliza en python)
         # frame_0_undistorted = cv2.undistort(
