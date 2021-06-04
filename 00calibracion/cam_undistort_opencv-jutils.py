@@ -91,10 +91,30 @@ def gstreamer_pipeline_usb(
     capture_height=HEIGHT,
     framerate=30,
 ):
+
+    # videobalance ########################## PONER LOS NUMEROS COMO X.X ##########################
+    # contrast            : contrast
+    #                     flags: readable, writable, controllable
+    #                     Double. Range:               0 -               2 Default:               1
+    # brightness          : brightness
+    #                     flags: readable, writable, controllable
+    #                     Double. Range:              -1 -               1 Default:               0
+    # hue                 : hue
+    #                     flags: readable, writable, controllable
+    #                     Double. Range:              -1 -               1 Default:               0
+    # saturation          : saturation
+    #                     flags: readable, writable, controllable
+    #                     Double. Range:               0 -               2 Default:               1
+
     return (
+        # TODO io-modes con las tres camaras a ver k tal, o decir que se ha probado y meh
+        # 'v4l2src device=/dev/video%d extra-controls="c,brightness=255,contrast=255,saturation=255" ! ' # TODO no funciona
+        # 'v4l2src device=/dev/video%d extra-controls="-c,brightness=128" ! ' # TODO no funciona
         "v4l2src device=/dev/video%d ! "
-        "nvv4l2decoder mjpeg=1 ! nvvidconv flip-method=%d ! "
+        'nvv4l2decoder mjpeg=1 ! '
+        "nvvidconv flip-method=%d ! "
         "video/x-raw, width=%d, height=%d, framerate=%d/1, format=BGRx ! "
+        # "videobalance contrast=1.0, brightness=0.0, hue=0.0, saturation=1.0 ! "
         "videoconvert ! video/x-raw, format=BGR ! appsink drop=1"
         % (
             sensor_id,
@@ -106,6 +126,42 @@ def gstreamer_pipeline_usb(
     )
 
 cap_0 = cv2.VideoCapture(gstreamer_pipeline_usb(), cv2.CAP_GSTREAMER)
+
+# /dev/video0
+# group_hold                    0x009a2003 (bool)   : default=0 value=0 flags=execute-on-write
+# sensor_mode                   0x009a2008 (int64)  : min=0 max=0 step=0 default=0 value=0 flags=slider
+# gain                          0x009a2009 (int64)  : min=0 max=0 step=0 default=0 value=16 flags=slider
+# exposure                      0x009a200a (int64)  : min=0 max=0 step=0 default=0 value=13 flags=slider
+# frame_rate                    0x009a200b (int64)  : min=0 max=0 step=0 default=0 value=2000000 flags=slider
+# bypass_mode                   0x009a2064 (intmenu): min=0 max=1 default=0 value=0
+# override_enable               0x009a2065 (intmenu): min=0 max=1 default=0 value=0
+# height_align                  0x009a2066 (int)    : min=1 max=16 step=1 default=1 value=1
+# size_align                    0x009a2067 (intmenu): min=0 max=2 default=0 value=0
+# write_isp_format              0x009a2068 (bool)   : default=0 value=0
+# sensor_signal_properties      0x009a2069 (u32)    : min=0 max=0 step=0 default=0 flags=read-only, has-payload
+# sensor_image_properties       0x009a206a (u32)    : min=0 max=0 step=0 default=0 flags=read-only, has-payload
+# sensor_control_properties     0x009a206b (u32)    : min=0 max=0 step=0 default=0 flags=read-only, has-payload
+# sensor_dv_timings             0x009a206c (u32)    : min=0 max=0 step=0 default=0 flags=read-only, has-payload
+# low_latency_mode              0x009a206d (bool)   : default=0 value=0
+# preferred_stride              0x009a206e (int)    : min=0 max=65535 step=1 default=0 value=0
+# sensor_modes                  0x009a2082 (int)    : min=0 max=30 step=1 default=30 value=6 flags=read-only
+
+# /dev/video1
+# brightness    0x00980900 (int)    : min=1 max=255 step=1 default=128 value=128
+# contrast      0x00980901 (int)    : min=1 max=255 step=1 default=128 value=128
+# saturation    0x00980902 (int)    : min=1 max=255 step=1 default=128 value=128
+
+import subprocess
+
+cam_props = {
+    'brightness': 128,
+    'contrast': 128,
+    'saturation': 128,
+}
+
+for key in cam_props:
+    subprocess.call(['v4l2-ctl -d /dev/video1 -c {}={}'.format(key, str(cam_props[key]))],
+                    shell=True)
 
 allgud = True
 
