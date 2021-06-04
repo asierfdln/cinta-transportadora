@@ -42,7 +42,7 @@ def CannyThreshold():
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input', help='Path to input image.', default='caja.png')
+parser.add_argument('--input', help='Path to input image.', default='00caja.png')
 args = parser.parse_args()
 src = cv.imread(args.input)
 
