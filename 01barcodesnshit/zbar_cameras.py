@@ -62,7 +62,7 @@ def gstreamer_pipeline_csi(
     display_height=720,
 ):
     return (
-        "nvarguscamerasrc sensor-id=%d sensor-mode=%d ! "
+        "nvarguscamerasrc sensor-id=%d sensor-mode=%d ee-mode=2 ee-strength=0.5 ! "
         "video/x-raw(memory:NVMM), "
         "width=(int)%d, height=(int)%d, "
         "format=(string)NV12, framerate=(fraction)%d/1 ! "
@@ -81,35 +81,37 @@ def gstreamer_pipeline_csi(
             display_height,
         )
     )
-    return (
-        "v4l2src device=/dev/video%d ! "
-        'nvv4l2decoder mjpeg=1 ! '
-        "nvvidconv flip-method=%d ! "
-        "video/x-raw, width=%d, height=%d, framerate=%d/1, format=BGRx ! "
-        # "videobalance contrast=1.0, brightness=0.0, hue=0.0, saturation=1.0 ! "
-        "videoconvert ! video/x-raw, format=BGR ! appsink drop=1"
-        % (
-            sensor_id,
-            flip_method,
-            capture_width,
-            capture_height,
-            framerate,
-        )
+
+usb_camera = False
+
+if usb_camera:
+    cap_0 = cv2.VideoCapture(gstreamer_pipeline_usb(), cv2.CAP_GSTREAMER)
+
+    import subprocess
+
+    cam_props = {
+        'brightness': 128,
+        'contrast': 128,
+        'saturation': 128,
+    }
+
+    for key in cam_props:
+        subprocess.call(['v4l2-ctl -d /dev/video1 -c {}={}'.format(key, str(cam_props[key]))],
+                        shell=True)
+else:
+    cap_0 = cv2.VideoCapture(
+        gstreamer_pipeline_csi(
+            sensor_id=0,
+            sensor_mode=3,
+            capture_width=1920,
+            capture_height=1080,
+            framerate=30,
+            flip_method=0,
+            display_width=1920,
+            display_height=1080,
+        ),
+        cv2.CAP_GSTREAMER
     )
-
-cap_0 = cv2.VideoCapture(gstreamer_pipeline_usb(), cv2.CAP_GSTREAMER)
-
-import subprocess
-
-cam_props = {
-    'brightness': 128,
-    'contrast': 128,
-    'saturation': 128,
-}
-
-for key in cam_props:
-    subprocess.call(['v4l2-ctl -d /dev/video1 -c {}={}'.format(key, str(cam_props[key]))],
-                    shell=True)
 
 allgud = True
 
@@ -165,20 +167,25 @@ while cap_0.isOpened() and allgud and output.IsStreaming():
 
     if retval_0:
 
-        # undistorsionamos la imagen
+        if usb_camera:
 
-        ############################
-        # INTER_LINEAR y demas en hackaday.io
-        frame_0_undistorted = cv2.remap(
-            frame_0,
-            mapx_2,
-            mapy_2,
-            cv2.INTER_LINEAR
-        )
-        # crop the image
-        x, y, w, h = roi_of_new_cam_matrix
-        frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
-        ############################
+            # undistorsionamos la imagen
+
+            ############################
+            # INTER_LINEAR y demas en hackaday.io
+            frame_0_undistorted = cv2.remap(
+                frame_0,
+                mapx_2,
+                mapy_2,
+                cv2.INTER_LINEAR
+            )
+            # crop the image
+            x, y, w, h = roi_of_new_cam_matrix
+            frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
+            ############################
+
+        else:
+            frame_0_undistorted = frame_0
 
         # detectamos los codigos de barras
         possible_codez_in_box = pyzbar.decode(frame_0_undistorted)
@@ -203,6 +210,14 @@ while cap_0.isOpened() and allgud and output.IsStreaming():
                 (0, 0, 255),
                 2
             )
+
+        # keyCode = cv2.waitKey(1) & 0xFF
+        # if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
+        #     print('--- SACAMOS FOTO ---')
+        #     cv2.imwrite(f'undistorted-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
+        # elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
+        #     print('--- SALIMOS DEL PROGRAMA ---')
+        #     break
 
         # frame_0_undistorted = cv2.resize(frame_0_undistorted, (window_WIDTH, window_HEIGHT))
         # cv2.imshow('CAM0 -- I/i o Espacio -> imagen | V/v o Enter -> video (play-pause) | Q/q o Esc -> Salir', frame_0_undistorted)
