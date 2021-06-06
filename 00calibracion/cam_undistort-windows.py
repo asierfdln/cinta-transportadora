@@ -22,6 +22,34 @@ cap_0.set(3, WIDTH)
 cap_0.set(4, HEIGHT)
 ########################
 
+# # ethanseow https://github.com/opencv/opencv/issues/9738
+# # we capture the first frame for the camera to adjust itself to the exposure
+# _, algo = cap_0.read()
+# print("######################################################")
+# print("######################################################")
+# print("######################################################")
+# print(f"CAP_PROP_APERTURE -> {cap_0.get(cv2.CAP_PROP_APERTURE)}")
+# print(f"CAP_PROP_MODE -> {cap_0.get(cv2.CAP_PROP_MODE)}")
+# print(f"CAP_PROP_BRIGHTNESS -> {cap_0.get(cv2.CAP_PROP_BRIGHTNESS)}")
+# print(f"CAP_PROP_CONTRAST -> {cap_0.get(cv2.CAP_PROP_CONTRAST)}")
+# print(f"CAP_PROP_SATURATION -> {cap_0.get(cv2.CAP_PROP_SATURATION)}")
+# print(f"CAP_PROP_HUE -> {cap_0.get(cv2.CAP_PROP_HUE)}")
+# print(f"CAP_PROP_GAIN -> {cap_0.get(cv2.CAP_PROP_GAIN)}")
+# print(f"CAP_PROP_EXPOSURE -> {cap_0.get(cv2.CAP_PROP_EXPOSURE)}")
+# print(f"CAP_PROP_RECTIFICATION -> {cap_0.get(cv2.CAP_PROP_RECTIFICATION)}")
+# print(f"CAP_PROP_SHARPNESS -> {cap_0.get(cv2.CAP_PROP_SHARPNESS)}")
+# print(f"CAP_PROP_AUTO_EXPOSURE -> {cap_0.get(cv2.CAP_PROP_AUTO_EXPOSURE)}")
+# print(f"CAP_PROP_GAMMA -> {cap_0.get(cv2.CAP_PROP_GAMMA)}")
+# print(f"CAP_PROP_TEMPERATURE -> {cap_0.get(cv2.CAP_PROP_TEMPERATURE)}")
+# print(f"CAP_PROP_FOCUS -> {cap_0.get(cv2.CAP_PROP_FOCUS)}")
+# print(f"CAP_PROP_AUTOFOCUS -> {cap_0.get(cv2.CAP_PROP_AUTOFOCUS)}")
+# print(f"CAP_PROP_CHANNEL -> {cap_0.get(cv2.CAP_PROP_CHANNEL)}")
+# print("######################################################")
+# print("######################################################")
+# print("######################################################")
+
+# sys.exit(0)
+
 allgud = True
 
 cam_matrix = None
@@ -148,10 +176,28 @@ while cap_0.isOpened() and allgud:
         frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
         ############################
 
+        # print("·························································")
+        # print(f"CAP_PROP_APERTURE -> {cap_0.get(cv2.CAP_PROP_APERTURE)}")
+        # print(f"CAP_PROP_MODE -> {cap_0.get(cv2.CAP_PROP_MODE)}")
+        # print(f"CAP_PROP_BRIGHTNESS -> {cap_0.get(cv2.CAP_PROP_BRIGHTNESS)}")
+        # print(f"CAP_PROP_CONTRAST -> {cap_0.get(cv2.CAP_PROP_CONTRAST)}")
+        # print(f"CAP_PROP_SATURATION -> {cap_0.get(cv2.CAP_PROP_SATURATION)}")
+        # print(f"CAP_PROP_HUE -> {cap_0.get(cv2.CAP_PROP_HUE)}")
+        # print(f"CAP_PROP_GAIN -> {cap_0.get(cv2.CAP_PROP_GAIN)}")
+        # print(f"CAP_PROP_EXPOSURE -> {cap_0.get(cv2.CAP_PROP_EXPOSURE)}")
+        # print(f"CAP_PROP_RECTIFICATION -> {cap_0.get(cv2.CAP_PROP_RECTIFICATION)}")
+        # print(f"CAP_PROP_SHARPNESS -> {cap_0.get(cv2.CAP_PROP_SHARPNESS)}")
+        # print(f"CAP_PROP_AUTO_EXPOSURE -> {cap_0.get(cv2.CAP_PROP_AUTO_EXPOSURE)}")
+        # print(f"CAP_PROP_GAMMA -> {cap_0.get(cv2.CAP_PROP_GAMMA)}")
+        # print(f"CAP_PROP_TEMPERATURE -> {cap_0.get(cv2.CAP_PROP_TEMPERATURE)}")
+        # print(f"CAP_PROP_FOCUS -> {cap_0.get(cv2.CAP_PROP_FOCUS)}")
+        # print(f"CAP_PROP_AUTOFOCUS -> {cap_0.get(cv2.CAP_PROP_AUTOFOCUS)}")
+        # print(f"CAP_PROP_CHANNEL -> {cap_0.get(cv2.CAP_PROP_CHANNEL)}")
+
         keyCode = cv2.waitKey(1) & 0xFF
         if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
             print('--- SACAMOS FOTO ---')
-            cv2.imwrite(f'../fondo_caja-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
+            cv2.imwrite(f'cajalucescolores/cajalucescolores-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
         elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
             print('--- SALIMOS DEL PROGRAMA ---')
             break
