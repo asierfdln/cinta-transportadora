@@ -84,22 +84,22 @@ while cap_0.isOpened() and allgud:
 
     if retval_0:
 
-        ############################
-        # INTER_LINEAR y demas en hackaday.io
-        frame_0_undistorted = cv2.remap(
-            frame_0,
-            mapx_2,
-            mapy_2,
-            cv2.INTER_LINEAR
-        )
-        # crop the image
-        x, y, w, h = roi_of_new_cam_matrix
-        frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
-        ############################
-
         keyCode = cv2.waitKey(1) & 0xFF
 
         if GPIO.event_detected(channel):
+
+            ############################
+            # INTER_LINEAR y demas en hackaday.io
+            frame_0_undistorted = cv2.remap(
+                frame_0,
+                mapx_2,
+                mapy_2,
+                cv2.INTER_LINEAR
+            )
+            # crop the image
+            x, y, w, h = roi_of_new_cam_matrix
+            frame_0_undistorted = frame_0_undistorted[y:y+h, x:x+w]
+            ############################
 
             cv2.destroyWindow('FG Mask')
             cv2.destroyWindow('FG Mask eroded')
