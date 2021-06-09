@@ -6,6 +6,42 @@ from datetime import datetime
 
 # import jetson.utils
 
+def my_polygon_mask(img=None, polygon=None, return_masked_img=False):
+
+    # https://docs.opencv.org/3.4/d3/d96/tutorial_basic_geometric_drawing.html
+    #     myPolygon
+
+    # Create some points
+    ppt = np.array(
+        [
+            # [370, 0],       # top-left
+            # [1235, 0],      # top-right
+            # [1383, 826],    # bottom-right ############################
+            # [185, 826],     # bottom-left
+            [443, 0],       # top-left
+            [1378, 0],      # top-right
+            [1495, 826],    # bottom-right
+            [295, 826],     # bottom-left
+        ],
+        # polygon,
+        np.int32
+    )
+    ppt = ppt.reshape((-1, 1, 2))
+
+    # cv2.FILLED    --> no work??
+    # cv2.LINE_4    --> 4-connected line
+    # cv2.LINE_8    --> 8-connected line
+    # cv2.LINE_AA   --> antialiased line
+
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    mask = np.zeros_like(img_gray)
+    cv2.fillPoly(mask, [ppt], (255, 255, 255), cv2.LINE_AA)
+    if return_masked_img:
+        img_masked = cv2.bitwise_and(img, img, mask=mask)
+        return img_masked
+    else:
+        return mask
+
 
 window_WIDTH = 1280
 window_HEIGHT = 720
@@ -194,10 +230,12 @@ while cap_0.isOpened() and allgud:
         # print(f"CAP_PROP_AUTOFOCUS -> {cap_0.get(cv2.CAP_PROP_AUTOFOCUS)}")
         # print(f"CAP_PROP_CHANNEL -> {cap_0.get(cv2.CAP_PROP_CHANNEL)}")
 
+        frame_0_undistorted = my_polygon_mask(img=frame_0_undistorted, return_masked_img=True)
+
         keyCode = cv2.waitKey(1) & 0xFF
         if keyCode == 32 or keyCode == ord('i') or keyCode == ord('I'):
             print('--- SACAMOS FOTO ---')
-            cv2.imwrite(f'cajalucescolores/cajalucescolores-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
+            cv2.imwrite(f'cam-dech-fondo-nomask-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}_0.png', frame_0_undistorted)
         elif keyCode == 27 or keyCode == ord('q') or keyCode == ord('Q'):
             print('--- SALIMOS DEL PROGRAMA ---')
             break
