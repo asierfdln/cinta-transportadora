@@ -14,14 +14,14 @@ def my_polygon_mask(img=None, polygon=None, return_masked_img=False):
     # Create some points
     ppt = np.array(
         [
-            # [370, 0],       # top-left
-            # [1235, 0],      # top-right
-            # [1383, 826],    # bottom-right ############################
-            # [185, 826],     # bottom-left
-            [443, 0],       # top-left
-            [1378, 0],      # top-right
-            [1495, 826],    # bottom-right
-            [295, 826],     # bottom-left
+            # [250, 0],       # top-left ############################
+            # [1350, 0],      # top-right
+            # [1380, 826],    # bottom-right
+            # [225, 826],     # bottom-left
+            [443, 0],       # top-left ############################
+            [1420, 0],      # top-right
+            [1540, 826],    # bottom-right
+            [290, 826],     # bottom-left
         ],
         # polygon,
         np.int32

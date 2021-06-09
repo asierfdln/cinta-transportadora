@@ -151,14 +151,14 @@ def start_camera():
     left_camera = CSI_Camera()
     left_camera.open(
         # gstreamer_pipeline_csi(
-        #     # capture_width=1920,
-        #     # capture_height=1080,
-        #     # display_width=1280,
-        #     # display_height=720,
-        #     # flip_method=0,
         #     sensor_id=0,
-        #     sensor_mode=3,
+        #     sensor_mode=2,
+        #     capture_width=1280,
+        #     capture_height=720,
+        #     framerate=30,
         #     flip_method=0,
+        #     display_width=1280,
+        #     display_height=720,
         # )
         gstreamer_pipeline_usb()
     )

@@ -276,6 +276,7 @@ cam_props = {
     'brightness': 128,
     'contrast': 128,
     'saturation': 128,
+    'white_balance_temperature_auto': 0,
 }
 
 for key in cam_props:

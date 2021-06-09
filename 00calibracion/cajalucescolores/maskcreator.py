@@ -7,18 +7,20 @@ img = cv2.imread("maskaraka.png")
 img = cv2.flip(img, 1)
 imgpaint = img.copy()
 
+# cam izq
 maskpoints = [
-    (370, 0),       # top-left
-    (1235, 0),      # top-right
-    (1383, 826),    # bottom-right
-    (185, 826),     # bottom-left
+    (250, 0),       # top-left
+    (1350, 0),      # top-right
+    (1380, 826),    # bottom-right
+    (225, 826),     # bottom-left
 ]
 
+# cam dech
 maskpoints = [
-    (443, 0),       # top-left
-    (1378, 0),      # top-right
-    (1495, 826),    # bottom-right
-    (295, 826),     # bottom-left
+    [443, 0],       # top-left
+    [1420, 0],      # top-right
+    [1540, 826],    # bottom-right
+    [290, 826],     # bottom-left
 ]
 
 cv2.circle(imgpaint, maskpoints[0], 5, (0, 0, 255), -1)
@@ -38,9 +40,9 @@ cv2.imwrite("maksarakainverted.png", imgpaint)
 #     # Create some points
 #     ppt = np.array(
 #         # [
-#         #     [370, 0],       # top-left
+#         #     [370, 0],       # top-left ############################
 #         #     [1235, 0],      # top-right
-#         #     [1383, 826],    # bottom-right ############################
+#         #     [1383, 826],    # bottom-right
 #         #     [185, 826],     # bottom-left
 #         # ],
 #         polygon,
