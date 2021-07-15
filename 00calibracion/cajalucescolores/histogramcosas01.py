@@ -19,6 +19,7 @@ Image Requirements:
  
 Usage:
   python histogram_matching.py <source_image> <ref_image> [<mask_image>]
+  histogramcosas01.py correccion_histogramas\referncias_y_sources\undis00_00.png correccion_histogramas\referncias_y_sources\ref00.png
 '''
  
 # Python 2/3 compatibility
@@ -124,20 +125,26 @@ def match_histograms(src_image, ref_image):
     # Compute the b, g, and r histograms separately
     # The flatten() Numpy method returns a copy of the array c
     # collapsed into one dimension.
-    src_hist_blue, bin_0 = np.histogram(src_b.flatten(), 256, [0,256])
-    src_hist_green, bin_1 = np.histogram(src_g.flatten(), 256, [0,256])
-    src_hist_red, bin_2 = np.histogram(src_r.flatten(), 256, [0,256])
-    ref_hist_blue, bin_3 = np.histogram(ref_b.flatten(), 256, [0,256])
-    ref_hist_green, bin_4 = np.histogram(ref_g.flatten(), 256, [0,256])
-    ref_hist_red, bin_5 = np.histogram(ref_r.flatten(), 256, [0,256])
+    # src_hist_blue, bin_0 = np.histogram(src_b.flatten(), 256, [0,256])
+    src_hist_blue_opencv = cv2.calcHist([src_b], [0], None, [256], [0, 256])
+    # src_hist_green, bin_1 = np.histogram(src_g.flatten(), 256, [0,256])
+    src_hist_green_opencv = cv2.calcHist([src_g],[0], None, [256], [0,256])
+    # src_hist_red, bin_2 = np.histogram(src_r.flatten(), 256, [0,256])
+    src_hist_red_opencv = cv2.calcHist([src_r],[0], None, [256], [0,256])
+    # ref_hist_blue, bin_3 = np.histogram(ref_b.flatten(), 256, [0,256])
+    ref_hist_blue_opencv = cv2.calcHist([ref_b],[0], None, [256], [0,256])
+    # ref_hist_green, bin_4 = np.histogram(ref_g.flatten(), 256, [0,256])
+    ref_hist_green_opencv = cv2.calcHist([ref_g],[0], None, [256], [0,256])
+    # ref_hist_red, bin_5 = np.histogram(ref_r.flatten(), 256, [0,256])
+    ref_hist_red_opencv = cv2.calcHist([ref_r],[0], None, [256], [0,256])
  
     # Compute the normalized cdf for the source and reference image
-    src_cdf_blue = calculate_cdf(src_hist_blue)
-    src_cdf_green = calculate_cdf(src_hist_green)
-    src_cdf_red = calculate_cdf(src_hist_red)
-    ref_cdf_blue = calculate_cdf(ref_hist_blue)
-    ref_cdf_green = calculate_cdf(ref_hist_green)
-    ref_cdf_red = calculate_cdf(ref_hist_red)
+    src_cdf_blue = calculate_cdf(np.array(src_hist_blue_opencv.reshape(-1), dtype=int))
+    src_cdf_green = calculate_cdf(np.array(src_hist_green_opencv.reshape(-1), dtype=int))
+    src_cdf_red = calculate_cdf(np.array(src_hist_red_opencv.reshape(-1), dtype=int))
+    ref_cdf_blue = calculate_cdf(np.array(ref_hist_blue_opencv.reshape(-1), dtype=int))
+    ref_cdf_green = calculate_cdf(np.array(ref_hist_green_opencv.reshape(-1), dtype=int))
+    ref_cdf_red = calculate_cdf(np.array(ref_hist_red_opencv.reshape(-1), dtype=int))
  
     # Make a separate lookup table for each color
     blue_lookup_table = calculate_lookup(src_cdf_blue, ref_cdf_blue)
